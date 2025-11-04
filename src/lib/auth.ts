@@ -1,8 +1,9 @@
-import NextAuth from "next-auth"
-import CredentialsProvider from "next-auth/providers/credentials"
-import { prisma } from "./prisma"
-import bcrypt from "bcrypt"
-import { z } from "zod"
+import 'dotenv/config'
+import NextAuth from 'next-auth'
+import CredentialsProvider from 'next-auth/providers/credentials'
+import { prisma } from './prisma'
+import bcrypt from 'bcrypt'
+import { z } from 'zod'
 
 const credentialsSchema = z.object({
   email: z.string().email(),
@@ -12,48 +13,38 @@ const credentialsSchema = z.object({
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
     CredentialsProvider({
-      name: "Credentials",
+      name: 'Credentials',
       credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
+        email: { label: 'Email', type: 'email' },
+        password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
-        // Validation du schéma
         const parsed = credentialsSchema.safeParse(credentials)
-        if (!parsed.success) {
-          throw new Error("Invalid credentials")
-        }
-
+        if (!parsed.success) throw new Error('Invalid credentials')
+        
         const { email, password } = parsed.data
-
-        // Recherche de l'utilisateur
-        const user = await prisma.user.findUnique({
-          where: { email },
-        })
-
-        if (!user) {
-          throw new Error("User not found")
-        }
-
-        // Vérification du mot de passe
+        const user = await prisma.user.findUnique({ where: { email } })
+        if (!user) throw new Error('User not found')
+        
         const passwordMatch = await bcrypt.compare(password, user.password)
-        if (!passwordMatch) {
-          throw new Error("Invalid password")
-        }
-
-        // Retour de l'utilisateur
+        if (!passwordMatch) throw new Error('Invalid password')
+        
         return {
           id: user.id,
           email: user.email,
           name: user.name,
           role: user.role,
-        }
+        } as any
       },
     }),
   ],
-
   callbacks: {
-    async jwt({ token, user }) {
+    
+
+    // @ts-ignore
+ 
+  
+    async jwt({ token, user }: any) {
       if (user) {
         token.id = user.id
         token.email = user.email
@@ -62,7 +53,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
       return token
     },
-    async session({ session, token }) {
+    async session({ session, token }: any) {
       if (session.user) {
         session.user.id = token.id
         session.user.email = token.email
@@ -72,14 +63,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       return session
     },
   },
-
   pages: {
-    signIn: "/login",
-    error: "/login",
+    signIn: '/login',
+    error: '/login',
   },
-
   session: {
-    strategy: "jwt",
-    maxAge: 7 * 24 * 60 * 60, // 7 jours
+    strategy: 'jwt',
+    maxAge: 7 * 24 * 60 * 60,
   },
 })
