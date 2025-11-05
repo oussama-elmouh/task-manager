@@ -1,11 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
 export default function LoginPage() {
-  const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -15,9 +13,10 @@ export default function LoginPage() {
     e.preventDefault()
     setError('')
     setLoading(true)
+
     try {
-      // Appeler l'API de connexion NextAuth
-      const response = await fetch('/api/auth/callback/credentials', {
+      // Appel direct à l'APIconst response = await fetch('/api/auth/login', {
+        const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -28,71 +27,70 @@ export default function LoginPage() {
         return
       }
 
-      // Rediriger vers le tableau de bord
-      router.push('/dashboard')
+      // Redirection manuelle
+      window.location.href = '/dashboard'
     } catch (err) {
-      console.error(err)
       setError('Erreur lors de la connexion')
+      console.error(err)
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-6">
-        <h1 className="text-2xl font-bold text-center mb-4">Connexion</h1>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+        <h1 className="text-3xl font-bold mb-2 text-center">TaskManager</h1>
+        <p className="text-gray-500 text-center mb-6">Connexion</p>
 
         {error && (
-          <div className="mb-3 text-sm text-red-600 bg-red-100 p-2 rounded-lg text-center">
-            {error}
+          <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg">
+            ⚠️ {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Email
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-              placeholder="user@example.com"
-            />
-          </div>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:outline-none"
+            placeholder="user@example.com"
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Mot de passe
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-              placeholder="••••••••"
-            />
-          </div>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:outline-none"
+            placeholder="••••••••"
+          />
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+            className="w-full bg-teal-600 text-white py-2 rounded-lg hover:bg-teal-700 disabled:opacity-50 font-medium"
           >
             {loading ? 'Connexion...' : 'Se connecter'}
           </button>
         </form>
 
-        <p className="mt-4 text-center text-sm text-gray-600">
-          Pas de compte ?{' '}
-          <Link href="/register" className="text-blue-600 hover:underline">
+        <p className="mt-6 text-center text-sm text-gray-600">
+          Pas de compte?{' '}
+          <Link href="/register" className="text-teal-600 hover:underline font-medium">
             S'inscrire
           </Link>
         </p>
+
+        <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+          <p className="text-xs font-semibold text-blue-900 mb-2">📝 Test:</p>
+          <p className="text-xs text-blue-800">Email: user@example.com</p>
+          <p className="text-xs text-blue-800">Mot de passe: password123</p>
+        </div>
       </div>
     </div>
   )

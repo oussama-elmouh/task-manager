@@ -6,21 +6,44 @@ import Link from 'next/link'
 
 export default function RegisterPage() {
   const router = useRouter()
-  const [email, setEmail] = useState('')
-  const [name, setName] = useState('')
-  const [password, setPassword] = useState('')
+  const [formData, setFormData] = useState({
+    email: '',
+    name: '',
+    password: '',
+    passwordConfirm: '',
+  })
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }))
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+    setSuccess('')
     setLoading(true)
+
+    if (formData.password !== formData.passwordConfirm) {
+      setError('Les mots de passe ne correspondent pas')
+      setLoading(false)
+      return
+    }
+
     try {
       const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, name, password }),
+        body: JSON.stringify({
+          email: formData.email,
+          name: formData.name,
+          password: formData.password,
+        }),
       })
 
       if (!response.ok) {
@@ -29,82 +52,104 @@ export default function RegisterPage() {
         return
       }
 
-      // Rediriger vers la page de connexion après succès
-      router.push('/login')
+      setSuccess("Inscription réussie! Redirection vers connexion...")
+      setTimeout(() => {
+        router.push('/login')
+      }, 2000)
     } catch (err) {
-      console.error(err)
       setError("Erreur lors de l'inscription")
+      console.error(err)
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-6">
-        <h1 className="text-2xl font-bold text-center mb-4">S'inscrire</h1>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+      <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-md">
+        <h1 className="text-2xl font-bold mb-2">TaskManager</h1>
+        <p className="mb-4 text-gray-600">Créer un nouveau compte</p>
 
-        {error && (
-          <div className="mb-3 text-sm text-red-600 bg-red-100 p-2 rounded-lg text-center">
-            {error}
-          </div>
-        )}
+        {error && <div className="mb-4 text-red-600 font-medium">⚠️ {error}</div>}
+        {success && <div className="mb-4 text-green-600 font-medium">✅ {success}</div>}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Nom
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Nom complet
             </label>
             <input
               type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
               placeholder="John Doe"
+              required
+              disabled={loading}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:outline-none"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Email
             </label>
             <input
               type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
               placeholder="user@example.com"
+              required
+              disabled={loading}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:outline-none"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Mot de passe
             </label>
             <input
               type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
               placeholder="••••••••"
+              required
+              disabled={loading}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:outline-none"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Confirmer mot de passe
+            </label>
+            <input
+              type="password"
+              name="passwordConfirm"
+              value={formData.passwordConfirm}
+              onChange={handleChange}
+              placeholder="••••••••"
+              required
+              disabled={loading}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:outline-none"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+            className="w-full bg-teal-600 text-white py-2 rounded-lg hover:bg-teal-700 transition"
           >
             {loading ? 'Inscription...' : "S'inscrire"}
           </button>
         </form>
 
-        <p className="mt-4 text-center text-sm text-gray-600">
-          Déjà inscrit ?{' '}
-          <Link href="/login" className="text-blue-600 hover:underline">
+        <p className="mt-4 text-sm text-gray-600">
+          Déjà inscrit?{' '}
+          <Link href="/login" className="text-teal-600 hover:underline font-medium">
             Se connecter
           </Link>
         </p>
