@@ -1,74 +1,50 @@
-import 'dotenv/config'
-import NextAuth from 'next-auth'
-import CredentialsProvider from 'next-auth/providers/credentials'
-import { prisma } from './prisma'
-import bcrypt from 'bcrypt'
-import { z } from 'zod'
+// Fonctions d'authentification centralisées
 
-const credentialsSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6),
-})
+export interface User {
+  id: string
+  email: string
+  name: string
+  role: string
+}
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
-  providers: [
-    CredentialsProvider({
-      name: 'Credentials',
-      credentials: {
-        email: { label: 'Email', type: 'email' },
-        password: { label: 'Password', type: 'password' },
-      },
-      async authorize(credentials) {
-        const parsed = credentialsSchema.safeParse(credentials)
-        if (!parsed.success) throw new Error('Invalid credentials')
-        
-        const { email, password } = parsed.data
-        const user = await prisma.user.findUnique({ where: { email } })
-        if (!user) throw new Error('User not found')
-        
-        const passwordMatch = await bcrypt.compare(password, user.password)
-        if (!passwordMatch) throw new Error('Invalid password')
-        
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role,
-        } as any
-      },
-    }),
-  ],
-  callbacks: {
-    
+export const AUTH_STORAGE_KEY = 'taskmanager_user'
 
-    // @ts-ignore
- 
-  
-    async jwt({ token, user }: any) {
-      if (user) {
-        token.id = user.id
-        token.email = user.email
-        token.name = user.name
-        token.role = user.role
-      }
-      return token
-    },
-    async session({ session, token }: any) {
-      if (session.user) {
-        session.user.id = token.id
-        session.user.email = token.email
-        session.user.name = token.name
-        session.user.role = token.role
-      }
-      return session
-    },
-  },
-  pages: {
-    signIn: '/login',
-    error: '/login',
-  },
-  session: {
-    strategy: 'jwt',
-    maxAge: 7 * 24 * 60 * 60,
-  },
-})
+// 🔹 Sauvegarder l'utilisateur
+export function saveUser(user: User): void {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user))
+  }
+}
+
+// 🔹 Récupérer l'utilisateur
+export function getUser(): User | null {
+  if (typeof window === 'undefined') return null
+  try {
+    const userJson = localStorage.getItem(AUTH_STORAGE_KEY)
+    if (!userJson) return null
+    return JSON.parse(userJson) as User
+  } catch (error) {
+    console.error('Error parsing user:', error)
+    return null
+  }
+}
+
+// 🔹 Vérifier si utilisateur est connecté
+export function isAuthenticated(): boolean {
+  return getUser() !== null
+}
+
+// 🔹 Déconnecter l'utilisateur
+export function logout(): void {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem(AUTH_STORAGE_KEY)
+    window.location.href = '/login'
+  }
+}
+
+// 🔹 Rediriger si pas authentifié
+export function requireAuth(): void {
+  if (typeof window !== 'undefined' && !isAuthenticated()) {
+    window.location.href = '/login'
+  }
+}

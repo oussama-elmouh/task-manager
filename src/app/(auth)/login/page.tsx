@@ -1,9 +1,13 @@
 'use client'
-
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useAuth } from '@/lib/authContext'
 
 export default function LoginPage() {
+  const router = useRouter()
+  const { login } = useAuth()
+
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -15,22 +19,26 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
-      // Appel direct à l'APIconst response = await fetch('/api/auth/login', {
-        const response = await fetch('/api/auth/login', {
+      const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       })
 
+      const data = await response.json()
+
       if (!response.ok) {
-        setError('Email ou mot de passe incorrect')
+        setError(data.error || 'Erreur de connexion')
         return
       }
 
-      // Redirection manuelle
-      window.location.href = '/dashboard'
+      // ✅ Utiliser le context pour sauvegarder l'utilisateur
+      login(data.user)
+
+      // ✅ Rediriger après connexion
+      router.push('/dashboard')
     } catch (err) {
-      setError('Erreur lors de la connexion')
+      setError('Erreur de connexion')
       console.error(err)
     } finally {
       setLoading(false)
@@ -38,14 +46,15 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h1 className="text-3xl font-bold mb-2 text-center">TaskManager</h1>
-        <p className="text-gray-500 text-center mb-6">Connexion</p>
+    <div className="flex items-center justify-center min-h-screen bg-gray-50">
+      <div className="w-full max-w-md bg-white shadow-lg rounded-2xl p-8">
+        <h1 className="text-2xl font-semibold text-center text-gray-800 mb-6">
+          Se connecter
+        </h1>
 
         {error && (
-          <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg">
-            ⚠️ {error}
+          <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm">
+            {error}
           </div>
         )}
 
@@ -56,8 +65,8 @@ export default function LoginPage() {
             onChange={(e) => setEmail(e.target.value)}
             required
             disabled={loading}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:outline-none"
-            placeholder="user@example.com"
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+            placeholder="Email"
           />
 
           <input
@@ -66,31 +75,25 @@ export default function LoginPage() {
             onChange={(e) => setPassword(e.target.value)}
             required
             disabled={loading}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:outline-none"
-            placeholder="••••••••"
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+            placeholder="Mot de passe"
           />
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-teal-600 text-white py-2 rounded-lg hover:bg-teal-700 disabled:opacity-50 font-medium"
+            className="w-full bg-teal-600 text-white py-2 rounded-lg hover:bg-teal-700 transition"
           >
             {loading ? 'Connexion...' : 'Se connecter'}
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-gray-600">
-          Pas de compte?{' '}
-          <Link href="/register" className="text-teal-600 hover:underline font-medium">
+        <p className="text-center text-sm text-gray-600 mt-4">
+          Pas de compte ?{' '}
+          <Link href="/register" className="text-teal-600 hover:underline">
             S'inscrire
           </Link>
         </p>
-
-        <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-          <p className="text-xs font-semibold text-blue-900 mb-2">📝 Test:</p>
-          <p className="text-xs text-blue-800">Email: user@example.com</p>
-          <p className="text-xs text-blue-800">Mot de passe: password123</p>
-        </div>
       </div>
     </div>
   )

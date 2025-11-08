@@ -15,36 +15,28 @@ const createTaskSchema = z.object({
 /* ============================================
    GET - Lister toutes les tâches
 ============================================ */
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
-    // TEMPORAIRE - Auth désactivée
-    // const session = await auth()
-    // if (!session?.user?.id) {
-    //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    // }
-
-    const { searchParams } = new URL(req.url)
-    const status = searchParams.get('status')
-    const priority = searchParams.get('priority')
-
-    const whereClause: any = {}
-    if (status) whereClause.status = status
-    if (priority) whereClause.priority = priority
-
     const tasks = await prisma.task.findMany({
-      where: whereClause,
       include: {
-        createdBy: { select: { id: true, name: true, email: true } },
-        assignedTo: { select: { id: true, name: true, email: true } },
+        createdBy: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: {
+        createdAt: 'desc',
+      },
     })
 
     return NextResponse.json(tasks)
   } catch (error) {
-    console.error('Error fetching tasks:', error)
+    console.error('Tasks GET error:', error)
     return NextResponse.json(
-      { error: 'Failed to fetch tasks', details: String(error) },
+      { error: 'Erreur lors de la récupération des tâches' },
       { status: 500 }
     )
   }
@@ -55,55 +47,56 @@ export async function GET(req: NextRequest) {
 ============================================ */
 export async function POST(req: NextRequest) {
   try {
-    // TEMPORAIRE - Auth désactivée
-    // const session = await auth()
-    // if (!session?.user?.id) {
-    //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    // }
-
-    // TEMPORAIRE - ID utilisateur fixe (à remplacer par session.user.id)
-    const sessionUserId = 'cmhjt1ml70000vgnwy4ytflia'
-
     const body = await req.json()
-    const parsed = createTaskSchema.safeParse(body)
+    const { title, description, status, priority, dueDate, createdById } = body
 
-    if (!parsed.success) {
-      // @ts-ignore
+    // ✅ Vérifier que createdById est fourni
+    if (!createdById) {
       return NextResponse.json(
-        {
-          error: 'Invalid input',
-          details: parsed.error.flatten().fieldErrors,
-        },
+        { error: 'ID utilisateur requis' },
         { status: 400 }
       )
     }
 
-    const { title, description, priority, dueDate, assignedToId } = parsed.data
+    // Validation
+    if (!title) {
+      return NextResponse.json(
+        { error: 'Le titre est requis' },
+        { status: 400 }
+      )
+    }
 
+    // ✅ Utiliser createdById depuis le body (envoyé par le frontend)
     const task = await prisma.task.create({
       data: {
         title,
-        description,
-        priority,
+        description: description || '',
+        status: status || 'TODO',
+        priority: priority || 'MEDIUM',
         dueDate: dueDate ? new Date(dueDate) : null,
-        createdById: sessionUserId,
-        assignedToId,
+        createdById, // ✅ Utiliser l'ID fourni
       },
       include: {
-        createdBy: { select: { id: true, name: true, email: true } },
-        assignedTo: { select: { id: true, name: true, email: true } },
+        createdBy: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
       },
     })
 
     return NextResponse.json(task, { status: 201 })
   } catch (error) {
-    console.error('Error creating task:', error)
+    console.error('Task POST error:', error)
     return NextResponse.json(
-      { error: 'Failed to create task', details: String(error) },
+      { error: 'Erreur lors de la création de la tâche' },
       { status: 500 }
     )
   }
 }
+
  
  
  
