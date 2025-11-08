@@ -21,21 +21,19 @@ Une application **fullstack moderne** de gestion de tâches construite avec **Ne
 ![Dashboard](images/image-1.png)
 ```
 
-### Mes Tâches
-```
-![Mes Tâches](images/image-1.png)
+### Dashboard
+![Dashboard](images/image-1.png)
 
-![Creer une tache](images/image-4.png)
-```
+### Mes Tâches
+![Mes Tâches](images/image-1.png)
+![Créer une tâche](images/image-4.png)
 
 ### Authentification
-```
 ![Authentification](images/image-2.png)
-```
+
 ### Register
-```
 ![Register](images/image-3.png)
-```
+
 
 ##  Technologies Utilisées
 
