@@ -35,7 +35,7 @@ Une application **fullstack moderne** de gestion de tâches construite avec **Ne
 
 ### Register
 ![Register](images/image-3.png)
-![alt text](image.png)
+
 
 ##  Technologies Utilisées
 
