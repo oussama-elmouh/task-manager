@@ -18,7 +18,7 @@ Une application **fullstack moderne** de gestion de tâches construite avec **Ne
 
 ### Dashboard
 ```
-![alt text](image.png)
+images/image-1.png
 ```
 
 ### Mes Tâches
