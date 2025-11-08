@@ -18,23 +18,23 @@ Une application **fullstack moderne** de gestion de tâches construite avec **Ne
 
 ### Dashboard
 ```
-images/image-1.png
+![Dashboard](images/image-1.png)
 ```
 
 ### Mes Tâches
 ```
-![alt text](image-1.png)
+![Mes Tâches](images/image-1.png)
 
-![alt text](image-4.png)
+![Creer une tache](images/image-4.png)
 ```
 
 ### Authentification
 ```
-![alt text](image-2.png)
+![Authentification](images/image-2.png)
 ```
 ### Register
 ```
-![alt text](image-3.png)
+![Register](images/image-3.png)
 ```
 
 ##  Technologies Utilisées
@@ -62,7 +62,7 @@ images/image-1.png
 - npm ou yarn
 - PostgreSQL (ou autre BD configurée)
 
-## 🔧 Installation
+##  Installation
 
 ### 1. Cloner le repo
 ```bash
@@ -176,10 +176,10 @@ task-manager/
 
 ##  Sécurité
 
-- ✅Routes protégées par authentification
-- ✅Validation des données côté serveur
-- ✅CORS configuré
-- ✅Type checking avec TypeScript
+- Routes protégées par authentification
+- Validation des données côté serveur
+- CORS configuré
+- Type checking avec TypeScript
 
 ##  Ressources Principales
 
@@ -187,27 +187,6 @@ task-manager/
 - [Prisma Documentation](https://www.prisma.io/docs)
 - [Tailwind CSS](https://tailwindcss.com)
 - [TypeScript](https://www.typescriptlang.org)
-
-
-
-
-## 📈 Performance
-
-- ✅ Optimisation d'images
-- ✅ Code splitting automatique
-- ✅ Lazy loading
-- ✅ Caching des données
-
-## 🤝 Contribuer
-
-Les contributions sont les bienvenues!
-
-1. Fork le projet
-2. Créer une branche (`git checkout -b feature/AmazingFeature`)
-3. Commit vos changements (`git commit -m 'Add some AmazingFeature'`)
-4. Push sur la branche (`git push origin feature/AmazingFeature`)
-5. Ouvrir une Pull Request
-
 
 
 ##  Support
