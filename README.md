@@ -28,12 +28,14 @@ Une application **fullstack moderne** de gestion de tâches construite avec **Ne
 ![Mes Tâches](images/image-1.png)
 ![Créer une tâche](images/image-4.png)
 
+### Utilisateur
+![Authentification](images/image-5.png)
 ### Authentification
 ![Authentification](images/image-2.png)
 
 ### Register
 ![Register](images/image-3.png)
-
+![alt text](image.png)
 
 ##  Technologies Utilisées
 
