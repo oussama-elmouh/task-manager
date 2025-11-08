@@ -97,7 +97,9 @@ npx prisma db seed  # Optional: populate seed data
 
 ### 5. Lancer le serveur
 ```bash
-npm run dev
+dotenv -e .env.local -- npx prisma studio #BD
+dotenv -e .env.local -- npm run dev  #APP
+ 
 ```
 
 Ouvrir [http://localhost:3000](http://localhost:3000)
